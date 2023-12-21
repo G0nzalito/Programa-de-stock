@@ -23,7 +23,10 @@ def manejoDeDrive(tipoOperacion):
         # Ruta del archivo CSV local que deseas subir
         # Crear un archivo en Google Drive
         archivo_drive = drive.CreateFile()
-        archivo_drive.SetContentFile('C:\\Users\\Usuario\\Documents\\Programa de stock\\DataBase.csv')  # Establecer el contenido del archivo
+        try:
+            archivo_drive.SetContentFile('C:\\Users\\Usuario\\Documents\\Programa de stock\\DataBase.csv')  # Establecer el contenido del archivo
+        except FileNotFoundError:
+            pass
         archivo_drive.Upload()  # Subir el archivo
 
         print("Archivo subido exitosamente a Google Drive.")
