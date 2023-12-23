@@ -14,7 +14,7 @@ def manejoDeDrive(tipoOperacion):
     if tipoOperacion == 'subir':
         
         gauth.LoadCredentialsFile("creds.json")
-        gauth.LoadClientConfigFile('C:\\Users\\Usuario\\Documents\\Programa de stock\\Pruebas insanas\\client_secret.json')
+        gauth.LoadClientConfigFile('C:\\Users\\Usuario\\Documents\\Programa de stock\\client_secret.json')
         gauth.LocalWebserverAuth()  # Abre una ventana del navegador para autenticación
         gauth.SaveCredentialsFile("creds.json")
         # Acceso al Google Drive
@@ -22,14 +22,24 @@ def manejoDeDrive(tipoOperacion):
 
         # Ruta del archivo CSV local que deseas subir
         # Crear un archivo en Google Drive
-        archivo_drive = drive.CreateFile()
+        archivo_drive_productos = drive.CreateFile()
         try:
-            archivo_drive.SetContentFile('C:\\Users\\Usuario\\Documents\\Programa de stock\\DataBase.csv')  # Establecer el contenido del archivo
+            archivo_drive_productos.SetContentFile('C:\\Users\\Usuario\\Documents\\Programa de stock\\DataBase.csv')  # Establecer el contenido del archivo
         except FileNotFoundError:
             pass
-        archivo_drive.Upload()  # Subir el archivo
+        archivo_drive_productos.Upload()  # Subir el archivo
+        archivo_drive_categorias = drive.CreateFile()
+        try:
+            archivo_drive_categorias.SetContentFile('C:\\Users\\Usuario\\Documents\\Programa de stock\\CategoriesFile.csv')
+        except FileNotFoundError:
+            pass
+
+        print('Subiendo archivo a Google drive')
+        
+        archivo_drive_categorias.Upload()
 
         print("Archivo subido exitosamente a Google Drive.")
+        sleep(1)
     elif tipoOperacion == 'actualizar':
         gauth.LoadCredentialsFile("creds.json")
         if gauth.credentials is None:
@@ -44,12 +54,34 @@ def manejoDeDrive(tipoOperacion):
         else:
             # Las credenciales existen y no han expirado
             pass
-        ruta_archivo_local = 'C:\\Users\\Usuario\\Documents\\Programa de stock\\DataBase.csv'
+        ruta_archivo_productos_local = 'C:\\Users\\Usuario\\Documents\\Programa de stock\\DataBase.csv'
+        ruta_archivo_categorias_local = 'C:\\Users\\Usuario\\Documents\\Programa de stock\\CategoriesFile.csv'
 
-        # Crear un archivo en Google Drive
-        archivo_drive = drive.CreateFile({'id': idEspecificaArchivo})
-        archivo_drive.SetContentFile(ruta_archivo_local)  # Establecer el contenido del archivo
-        archivo_drive.Upload()  # Subir el archivo
+        opcion = checkInput(['1', '2', '3'], 'Ingrese el numero de archivo que usted quiera subir: ', '1) Base de datos de Productos \n 2) Base de datos de categorias \n 3) Ambos')
+
+
+        if opcion == 1:
+            # Crear un archivo en Google Drive
+            archivo_drive = drive.CreateFile({'id': idEspecificaArchivoProductos})
+            archivo_drive.SetContentFile(ruta_archivo_productos_local)  # Establecer el contenido del archivo
+            archivo_drive.Upload()  # Subir el archivo
+        elif opcion == 2: 
+            # Crear un archivo en Google Drive
+            archivo_drive = drive.CreateFile({'id': idEspecificaArchivoCategorias})
+            archivo_drive.SetContentFile(ruta_archivo_categorias_local)  # Establecer el contenido del archivo
+            archivo_drive.Upload()  # Subir el archivo
+        else:
+            # Crear un archivo en Google Drive
+            archivo_drive = drive.CreateFile({'id': idEspecificaArchivoProductos})
+            archivo_drive.SetContentFile(ruta_archivo_productos_local)  # Establecer el contenido del archivo
+            archivo_drive.Upload()  # Subir el archivo
+            # Crear un archivo en Google Drive
+            archivo_drive = drive.CreateFile({'id': idEspecificaArchivoCategorias})
+            archivo_drive.SetContentFile(ruta_archivo_categorias_local)  # Establecer el contenido del archivo
+            archivo_drive.Upload()  # Subir el archivo
+
+        print('Archivo actualizado con exito en google drive')
+
     elif tipoOperacion == 'bajar':
         gauth.LoadCredentialsFile("creds.json")
 
@@ -68,10 +100,24 @@ def manejoDeDrive(tipoOperacion):
             pass
 
         # Crear un archivo en Google Drive
-        archivo_drive = drive.CreateFile({'id': idEspecificaArchivo})
-        archivo_drive.GetContentFile('DataBase.csv')
+
+        opcion = checkInput(['1', '2', '3'], 'Ingrese el numero de archivo que usted quiera bajar: ', '1) Base de datos de Productos \n 2) Base de datos de categorias \n 3) Ambos')
+
+
+        if opcion == 1:
+            archivo_drive = drive.CreateFile({'id': idEspecificaArchivoProductos})
+            archivo_drive.GetContentFile('DataBase.csv')
+        elif opcion == 2: 
+            archivo_drive = drive.CreateFile({'id': idEspecificaArchivoCategorias})
+            archivo_drive.GetContentFile('CategoriesFile.csv')
+        else:
+            archivo_drive = drive.CreateFile({'id': idEspecificaArchivoProductos})
+            archivo_drive.GetContentFile('DataBase.csv')
+            archivo_drive = drive.CreateFile({'id': idEspecificaArchivoCategorias})
+            archivo_drive.GetContentFile('CategoriesFile.csv')
 
         print("Archivo bajado exitosamente de Google Drive.")
+        sleep(1)
 
 def modificacion_a_archivo(nombreArchivo, fieldNames, tipoCampoClave, campoClave, campoAModificar, modificación):
     with open(nombreArchivo, 'r') as archivo:
@@ -320,8 +366,8 @@ def existeNombre(nombreCar):
 
 def crearNuevaCategoria():
     decision = 'y'
-    if not(os.path.exists(nomArchCat)):
-        with open(nomArchCat, 'xt') as archivo:
+    if not(os.path.exists(nomArchCat)) or os.path.getsize(nomArchCat) < 25:
+        with open(nomArchCat, 'wt') as archivo:
             escritor = csv.DictWriter(archivo, fieldnames = fieldNamesCat, delimiter='|')
             escritor.writeheader()
             nombre = input('Ingrese un nombre para la nueva categoria: ')
@@ -444,25 +490,29 @@ def asignarValores():
     return newCodigo, newNombre, colores, precio, stock, categoria 
 
 def cargarProductos():
+    while True:
+        codigo, nombre, colores, precio, stock, categoria = asignarValores()
+        if categoria == None:
+            return
+
+        producto = Producto(codigo, nombre, colores, precio, stock, categoria)
+
+
+        if not(os.path.exists(nomArchProd)) or os.path.getsize(nomArchProd) < 60:
+            with open(nomArchProd, 'wt') as archivo:
+                escritor = csv.DictWriter(archivo, fieldnames=fieldNamesProd, delimiter='|')
+                escritor.writeheader()
+                escritor.writerow(producto.cargador())
+        else:
+            with open(nomArchProd, 'at') as archivo:
+                escritor = csv.DictWriter(archivo, fieldnames=fieldNamesProd, delimiter='|')
+                escritor.writerow(producto.cargador())
     
-    codigo, nombre, colores, precio, stock, categoria = asignarValores()
-    if categoria == None:
-        return
-
-    producto = Producto(codigo, nombre, colores, precio, stock, categoria)
-
-
-    if not(os.path.exists(nomArchProd)):
-        with open(nomArchProd, 'xt') as archivo:
-            escritor = csv.DictWriter(archivo, fieldnames=fieldNamesProd, delimiter='|')
-            escritor.writeheader()
-            escritor.writerow(producto.cargador())
-    else:
-        with open(nomArchProd, 'at') as archivo:
-            escritor = csv.DictWriter(archivo, fieldnames=fieldNamesProd, delimiter='|')
-            escritor.writerow(producto.cargador())
+        decision = checkInput(['y' , 'n', 'Y', 'N'], '¿Desea cargar más prodcutos?(Ingrese "y" para si o ingrese "n" para no): ', menu=str())
+        
+        if decision == 'n':
+            break
     
-    pass
 
 
 def main():
@@ -470,9 +520,12 @@ def main():
     global nomArchCat 
     global fieldNamesProd
     global fieldNamesCat
-    global idEspecificaArchivo
+    global idEspecificaArchivoProductos
+    global idEspecificaArchivoCategorias
 
-    idEspecificaArchivo = '1fwihD6xOipHsumnY1IV0WQVQNeUGwj3z'
+
+    idEspecificaArchivoProductos = '1if16_12xy-PV6kp1blyzUtZ7B7cj0uTo'
+    idEspecificaArchivoCategorias = '1rJPLwpcpMAXsNqaUO_KQI_JlobkhuVSz'
     nomArchProd = 'DataBase.csv'
     nomArchCat = 'CategoriesFile.csv'
     fieldNamesProd = ['codigo', 'nombre', 'colores', 'precio', 'stock', 'nombre_categoria', 'estado']
@@ -601,4 +654,3 @@ if __name__ == '__main__':
         for linea in lector:
             print(linea[0])
 
-# Alan pelotudo
