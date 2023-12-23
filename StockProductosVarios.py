@@ -150,21 +150,41 @@ def buscarProducto(campo):
 
             for line in lineas:
                 codigo = line['codigo']
+                nombre = line['nombre']
                 if codigo == campo:
                     producto = Producto(line['codigo'], line['nombre'], str_to_list(line['colores']), line['precio'], line['stock'], line['nombre_categoria'])
                     print(producto)
-                    break
-    
+                    decision = checkInput(['y','Y',str()], '¿Quiere vender este producto?(Ingrese "y" para si, no ingrese nada para no)', str())
+                    if decision != str():
+                        cantidad = input('Ingrese la cantidad de productos vendidos: ')
+                        while not(esNumero(cantidad)) or (int(cantidad) > int(line['stock'])):
+                            print('ERROR, la cantidad esta mal cargada o excede la cantidad que tenemos en stock, por favor ingrese un número')
+                            cantidad = input('Ingrese la cantidad de productos vendidos: ')
+                        mensaje = 'El precio por ' + str(cantidad) + ' unidad/es del producto ' + line['nombre'] + ' es ' + str(int(line['precio']) * int(cantidad)) 
+                        print(mensaje)
+                        decision = checkInput(['y', 'Y', str()], 'Ingrese "Y", para confirmar la baja del stock, no ingrese nada para cancelar la venta', str())
+                        if decision != str():
+                            modificarStock(codigo, int(cantidad))
     else:
         with open(rutaArchivoProductos, 'r') as archivo:
             lector = csv.DictReader(archivo, delimiter='|')
             lineas = list(lector)
-
+            mostroAlgo = False
             for line in lineas:
                 nombre = line['nombre']
                 if campo in nombre or campo in nombre.lower():
                     producto = Producto(line['codigo'], line['nombre'], str_to_list(line['colores']), line['precio'], line['stock'], line['nombre_categoria'])
                     print(producto)
+                    mostroAlgo = True
+            if mostroAlgo:
+                decision = checkInput(['y','Y',str()], '¿Desea vender algun producto de los enlistados anteriormente?(Ingrese "y" para si, no ingrese nada para no)', str())
+                if decision != str():
+                    codigo = input('Ingrese el codigo del producto que quiere vender: ')
+                    while not(existeCodigo(codigo)):
+                        print('ERROR, este codigo no existe en la base de datos, por favor revise lo que cargó')
+                        codigo = input('Ingrese el codigo del producto que quiere vender: ')
+
+                    buscarProducto(codigo)
     
 
 def modificarCampoEsp(codigo):
@@ -320,7 +340,7 @@ def bajaElemento(campoClave, tipo):
         else:
             return False
 
-def modificarStock(codigoCar):
+def modificarStock(codigoCar, cantidadCar = 0):
 
     encontrado = False
 
@@ -330,12 +350,22 @@ def modificarStock(codigoCar):
         for line in lineas:
             codigo = line['codigo']
             if codigo == codigoCar:
-                while not encontrado:
-                    modificacion = int(input('Ingrese la cantidad de producto que se vendio precedido con un "-", o la cantidad de producto que entró: '))
-                    nuevoStock = int(line['stock']) + modificacion
-                    if nuevoStock < 0:
-                        print('No tenemos la cantidad necesaria de producto en stock para realizar esta venta. Por favor revise el valor que cargó')
-                        continue
+                if cantidadCar == 0:
+                    stock = line['stock']
+                    nombre = line['nombre']
+                    mensaje = 'Tenemos ' + str(stock) + ' unidad/es del producto ' + str(nombre) + ' en stock.'
+                    while not encontrado:
+                        print(mensaje)
+                        modificacion = int(input('Ingrese la cantidad de producto que se vendio precedido con un "-", o la cantidad de producto que entró: '))
+                        nuevoStock = int(line['stock']) + modificacion
+                        if nuevoStock < 0:
+                            print('No tenemos la cantidad necesaria de producto en stock para realizar esta venta. Por favor revise el valor que cargó')
+                            continue
+                        line['stock'] = str(nuevoStock)
+                        encontrado = True
+                        break
+                else:
+                    nuevoStock = int(line['stock']) - cantidadCar
                     line['stock'] = str(nuevoStock)
                     encontrado = True
                     break
@@ -538,7 +568,7 @@ def main():
     opcion = -1
 
     while opcion != str('s'):
-        
+        os.system('cls')
         opcion = checkInput(alfabeto_opciones, 'Ingrese la opcion que desea: ', menu)
         print(opcion)
         
