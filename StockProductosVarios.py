@@ -399,7 +399,13 @@ def crearNuevaCategoria():
             escritor = csv.DictWriter(archivo, fieldnames = fieldNamesCat, delimiter='|')
             escritor.writeheader()
             nombre = input('Ingrese un nombre para la nueva categoria: ')
+            while esNumero(nombre):
+                print('ERROR, las categorias solo llevan letras en el nombre, por favor revise lo que ingreso')
+                nombre = input('Ingrese un nombre para la nueva categoria: ')
             aumento = input('Ingrese el aumento general que tendran los productos de esta categoria: ')
+            while not(esNumero(aumento)):
+                print('ERROR, los aumentos son porcentuales, por lo tanto no se pueden ingresar letras. Por faovr, revise lo que ingreso')
+                aumento = input('Ingrese el aumento general que tendras los productos de esta categoria: ')
             diccionario = {'nombre': nombre, 'aumento': aumento, 'estado': True}
             escritor.writerow(diccionario)
             archivo.flush()
@@ -577,6 +583,7 @@ def main():
             print('Usted selecciono la opcion 1: Buscar un producto por codigo o nombre')
             campo = input('Ingrese el codigo o nombre del producto que quiere buscar: ')
             buscarProducto(campo)
+            input('Ingerse enter para continuar')
 
 
 
@@ -584,6 +591,7 @@ def main():
 
             print('Usted selecciono la opcion 2: Cargar nuevos productos')
             cargarProductos()
+            input('Ingerse enter para continuar')
         
         elif opcion == 3:
            
@@ -595,13 +603,16 @@ def main():
 
             if modificarStock(codigo):
                 print('El stock del producto fue actualizado con exito')
+                input('Ingerse enter para continuar')
             elif not(modificarStock(codigo)):
                 print('No se encontró ningun producto con el codigo especificado, por favor ingrese otro codigo.')
-
+                input('Ingerse enter para continuar')
         elif opcion == 4:
     
             print('Usted selecciono la opcion 4: Crear nueva categoria')
             crearNuevaCategoria()
+            print('Categoria creada correctamente')
+            input('Ingerse enter para continuar')
 
         elif opcion == 5:
 
@@ -613,8 +624,10 @@ def main():
 
             if bajaElemento(nombre, 'Categoria'):
                 print('La categoria fue eliminada con exito')
+                input('Ingerse enter para continuar')
             elif not(bajaElemento(nombre,'Categoria')):
                 print('No se ha encontrado la categoria con el nombre especificado, por favor ingrese otro nombre.')
+                input('Ingerse enter para continuar')
 
         elif opcion == 6:
 
@@ -628,7 +641,7 @@ def main():
             menu_cambios = '1) nombre' + '\n' + '2) Colores' + '\n' + '3) Precio' + '\n' + '4) Categoria' + '\n'
             print(menu_cambios)
             modificarCampoEsp(codigo)
-        
+            input('Ingerse enter para continuar')
         
         
         elif opcion == 7:
@@ -641,8 +654,10 @@ def main():
 
             if bajaElemento(codigo, 'Producto'):
                 print('El producto fue eliminado con exito.')
+                input('Ingerse enter para continuar')
             elif not(bajaElemento(codigo,'Producto')):
                 print('No se ha encontrado un producto con el codigo especificado, por favor ingrese otro codigo.')
+                input('Ingerse enter para continuar')
 
         
         elif opcion == 8: 
@@ -652,11 +667,13 @@ def main():
             contador = aumentarPrecioCategoria(categoria)
             mensaje = 'Se le cambio el precio a ' + str(contador) + ' productos'
             print(mensaje)
+            input('Ingerse enter para continuar')
 
         elif opcion == 9:
             print('Usted selecciono la opcion 9: Cambiar el aumento general predeterminado de una categoria')
             categoria = asignarCategoria()
             cambiarAumento(categoria)
+            input('Ingerse enter para continuar')
 
         elif opcion == 'nuncadebeserejecutada':
             print('Usted selecciono la opcion _: Cargar un archivo en Google Drive')
@@ -665,10 +682,12 @@ def main():
         elif opcion == 10:
             print('Usted selecciono la opcion 10: Cargar modificaciones en la base de datos online')
             manejoDeDrive('actualizar')
+            input('Ingerse enter para continuar')
 
         elif opcion == 11:
             print('Usted selecciono la opcion 11: Bajar las actualizaciones desde la base de datos online')
             manejoDeDrive('bajar')
+            input('Ingerse enter para continuar')
 
         elif opcion == 's':
             print('Muchas gracias por usar el programa, que tenga un lindo dia')
