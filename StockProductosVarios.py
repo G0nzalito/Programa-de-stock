@@ -24,13 +24,13 @@ def manejoDeDrive(tipoOperacion):
         # Crear un archivo en Google Drive
         archivo_drive_productos = drive.CreateFile()
         try:
-            archivo_drive_productos.SetContentFile('C:\\Users\\Usuario\\Documents\\Programa de stock\\DataBase.csv')  # Establecer el contenido del archivo
+            archivo_drive_productos.SetContentFile(rutaArchivoProductos)  # Establecer el contenido del archivo
         except FileNotFoundError:
             pass
         archivo_drive_productos.Upload()  # Subir el archivo
         archivo_drive_categorias = drive.CreateFile()
         try:
-            archivo_drive_categorias.SetContentFile('C:\\Users\\Usuario\\Documents\\Programa de stock\\CategoriesFile.csv')
+            archivo_drive_categorias.SetContentFile(rutaArchivoCategorias)
         except FileNotFoundError:
             pass
 
@@ -54,8 +54,6 @@ def manejoDeDrive(tipoOperacion):
         else:
             # Las credenciales existen y no han expirado
             pass
-        ruta_archivo_productos_local = 'C:\\Users\\Usuario\\Documents\\Programa de stock\\DataBase.csv'
-        ruta_archivo_categorias_local = 'C:\\Users\\Usuario\\Documents\\Programa de stock\\CategoriesFile.csv'
 
         opcion = checkInput(['1', '2', '3'], 'Ingrese el numero de archivo que usted quiera subir: ', '1) Base de datos de Productos \n 2) Base de datos de categorias \n 3) Ambos')
 
@@ -63,21 +61,21 @@ def manejoDeDrive(tipoOperacion):
         if opcion == 1:
             # Crear un archivo en Google Drive
             archivo_drive = drive.CreateFile({'id': idEspecificaArchivoProductos})
-            archivo_drive.SetContentFile(ruta_archivo_productos_local)  # Establecer el contenido del archivo
+            archivo_drive.SetContentFile(rutaArchivoProductos)  # Establecer el contenido del archivo
             archivo_drive.Upload()  # Subir el archivo
         elif opcion == 2: 
             # Crear un archivo en Google Drive
             archivo_drive = drive.CreateFile({'id': idEspecificaArchivoCategorias})
-            archivo_drive.SetContentFile(ruta_archivo_categorias_local)  # Establecer el contenido del archivo
+            archivo_drive.SetContentFile(rutaArchivoCategorias)  # Establecer el contenido del archivo
             archivo_drive.Upload()  # Subir el archivo
         else:
             # Crear un archivo en Google Drive
             archivo_drive = drive.CreateFile({'id': idEspecificaArchivoProductos})
-            archivo_drive.SetContentFile(ruta_archivo_productos_local)  # Establecer el contenido del archivo
+            archivo_drive.SetContentFile(rutaArchivoProductos)  # Establecer el contenido del archivo
             archivo_drive.Upload()  # Subir el archivo
             # Crear un archivo en Google Drive
             archivo_drive = drive.CreateFile({'id': idEspecificaArchivoCategorias})
-            archivo_drive.SetContentFile(ruta_archivo_categorias_local)  # Establecer el contenido del archivo
+            archivo_drive.SetContentFile(rutaArchivoCategorias)  # Establecer el contenido del archivo
             archivo_drive.Upload()  # Subir el archivo
 
         print('Archivo actualizado con exito en google drive')
@@ -106,15 +104,15 @@ def manejoDeDrive(tipoOperacion):
 
         if opcion == 1:
             archivo_drive = drive.CreateFile({'id': idEspecificaArchivoProductos})
-            archivo_drive.GetContentFile('DataBase.csv')
+            archivo_drive.GetContentFile(rutaArchivoProductos)
         elif opcion == 2: 
             archivo_drive = drive.CreateFile({'id': idEspecificaArchivoCategorias})
-            archivo_drive.GetContentFile('CategoriesFile.csv')
+            archivo_drive.GetContentFile(rutaArchivoCategorias)
         else:
             archivo_drive = drive.CreateFile({'id': idEspecificaArchivoProductos})
-            archivo_drive.GetContentFile('DataBase.csv')
+            archivo_drive.GetContentFile(rutaArchivoProductos)
             archivo_drive = drive.CreateFile({'id': idEspecificaArchivoCategorias})
-            archivo_drive.GetContentFile('CategoriesFile.csv')
+            archivo_drive.GetContentFile(rutaArchivoCategorias)
 
         print("Archivo bajado exitosamente de Google Drive.")
         sleep(1)
@@ -128,7 +126,7 @@ def modificacion_a_archivo(nombreArchivo, fieldNames, tipoCampoClave, campoClave
             if campoClave == campoClaveOrg:
                 line[campoAModificar] = modificación
     
-    with open(nomArchCat, 'w') as archivo:
+    with open(rutaArchivoCategorias, 'w') as archivo:
         escritor = csv.DictWriter(archivo, fieldnames=fieldNames, delimiter='|')
         escritor.writeheader()
         escritor.writerows(lineas)
@@ -139,14 +137,14 @@ def cambiarAumento(categoria):
         print('ERROR, usted esta intentando ingresar un valor no numerico como un aumento, por favor, ingrese un aumento valido')
         nuevoAumento = input('Ingrese el nuevo aumento que quiere agregar a la catgoria seleccionada: ')
 
-    modificacion_a_archivo(nomArchCat, fieldNamesCat, 'nombre', categoria, 'aumento', nuevoAumento)
+    modificacion_a_archivo(rutaArchivoCategorias, fieldNamesCat, 'nombre', categoria, 'aumento', nuevoAumento)
     
     
 
 def buscarProducto(campo):
 
     if esNumero(campo):
-        with open(nomArchProd, 'r') as archivo:
+        with open(rutaArchivoProductos, 'r') as archivo:
             lector = csv.DictReader(archivo, delimiter='|')
             lineas = list(lector)
 
@@ -158,7 +156,7 @@ def buscarProducto(campo):
                     break
     
     else:
-        with open(nomArchProd, 'r') as archivo:
+        with open(rutaArchivoProductos, 'r') as archivo:
             lector = csv.DictReader(archivo, delimiter='|')
             lineas = list(lector)
 
@@ -188,8 +186,8 @@ def modificarCampoEsp(codigo):
             while True:
                 banderaIgual = False
                 cambio = input('Ingrese el nombre del producto que desea cargar: ')
-                if os.path.exists(nomArchProd):
-                    with open(nomArchProd, 'r') as archivo:
+                if os.path.exists(rutaArchivoProductos):
+                    with open(rutaArchivoProductos, 'r') as archivo:
                         lector = csv.DictReader(archivo, delimiter='|')
                         for line in lector:
                             nombre = line['nombre']
@@ -220,7 +218,7 @@ def modificarCampoEsp(codigo):
             print('Opcion incorrecta, por favor, cargue alguna de las opciones anteriores.')
     
 
-    with open(nomArchProd, 'r') as archivo:
+    with open(rutaArchivoProductos, 'r') as archivo:
         lector = csv.DictReader(archivo, delimiter='|')
         lineas = list(lector)
         for line in lineas:
@@ -228,7 +226,7 @@ def modificarCampoEsp(codigo):
             if codigo == codigoCar:
                 line[campo] = cambio
     
-    with open(nomArchProd, 'w') as archivo:
+    with open(rutaArchivoProductos, 'w') as archivo:
         escritor = csv.DictWriter(archivo, fieldnames=fieldNamesProd, delimiter='|')
         escritor.writeheader()
         escritor.writerows(lineas)
@@ -239,7 +237,7 @@ def aumentarPrecioCategoria(categoria):
 
     contador = 0
     
-    with open(nomArchCat, 'r') as archivo:
+    with open(rutaArchivoCategorias, 'r') as archivo:
         lector = csv.DictReader(archivo, delimiter='|')
         lineas = list(lector)
         for line in lineas:
@@ -259,7 +257,7 @@ def aumentarPrecioCategoria(categoria):
             print('ERROR, usted esta intentando ingresar un valor no numerico como un aumento, por favor, ingrese un aumento valido')
             aumento = input('Ingrese el porcentaje de aumento que prefiere en esta ocasion (Recuerde que puede cambiar el aumento predeterminado en la opcion numero 9): ')
 
-    with open(nomArchProd, 'r') as archivo:
+    with open(rutaArchivoProductos, 'r') as archivo:
         lector = csv.DictReader(archivo, delimiter='|')
         lineas = list(lector)
         for line in lineas:
@@ -269,7 +267,7 @@ def aumentarPrecioCategoria(categoria):
                 line['precio'] = str(nuevoPrecio)
                 contador += 1
     
-    with open(nomArchProd, 'w') as archivo:
+    with open(rutaArchivoProductos, 'w') as archivo:
         escritor = csv.DictWriter(archivo, fieldnames=fieldNamesProd, delimiter='|')
         escritor.writeheader()
         escritor.writerows(lineas)
@@ -282,7 +280,7 @@ def bajaElemento(campoClave, tipo):
     encontrado = False
 
     if tipo == 'Producto':
-        with open(nomArchProd, 'r+') as archivo:
+        with open(rutaArchivoProductos, 'r+') as archivo:
             lector = csv.DictReader(archivo, delimiter="|")
             lineas = list(lector)
             for line in lineas:
@@ -293,7 +291,7 @@ def bajaElemento(campoClave, tipo):
                     break
         
         if encontrado:
-            with open(nomArchProd, 'w') as archivo:    
+            with open(rutaArchivoProductos, 'w') as archivo:    
                 escritor = csv.DictWriter(archivo, fieldNamesProd, delimiter='|')
                 escritor.writeheader()
                 escritor.writerows(lineas)
@@ -302,7 +300,7 @@ def bajaElemento(campoClave, tipo):
         else:
             return False
     elif tipo == 'Categoria':
-        with open(nomArchCat, 'r+') as archivo:
+        with open(rutaArchivoCategorias, 'r+') as archivo:
             lector = csv.DictReader(archivo, delimiter="|")
             lineas = list(lector)
             for line in lineas:
@@ -313,7 +311,7 @@ def bajaElemento(campoClave, tipo):
                     break
         
         if encontrado:
-            with open(nomArchCat, 'w') as archivo:    
+            with open(rutaArchivoCategorias, 'w') as archivo:    
                 escritor = csv.DictWriter(archivo, fieldNamesCat, delimiter='|')
                 escritor.writeheader()
                 escritor.writerows(lineas)
@@ -326,7 +324,7 @@ def modificarStock(codigoCar):
 
     encontrado = False
 
-    with open(nomArchProd, 'r+') as archivo:
+    with open(rutaArchivoProductos, 'r+') as archivo:
         lector = csv.DictReader(archivo, delimiter="|")
         lineas = list(lector)
         for line in lineas:
@@ -342,7 +340,7 @@ def modificarStock(codigoCar):
                     encontrado = True
                     break
     if encontrado:
-        with open(nomArchProd, 'w') as archivo:    
+        with open(rutaArchivoProductos, 'w') as archivo:    
             escritor = csv.DictWriter(archivo, fieldNamesProd, delimiter='|')
             escritor.writeheader()
             escritor.writerows(lineas)
@@ -353,8 +351,8 @@ def modificarStock(codigoCar):
 
 
 def existeNombre(nombreCar):
-    if os.path.exists(nomArchCat):
-        with open(nomArchCat, 'rt') as archivo:
+    if os.path.exists(rutaArchivoCategorias):
+        with open(rutaArchivoCategorias, 'rt') as archivo:
             lector = csv.DictReader(archivo, delimiter='|')
             for line in lector:
                 nombre = line['nombre']
@@ -366,8 +364,8 @@ def existeNombre(nombreCar):
 
 def crearNuevaCategoria():
     decision = 'y'
-    if not(os.path.exists(nomArchCat)) or os.path.getsize(nomArchCat) < 25:
-        with open(nomArchCat, 'wt') as archivo:
+    if not(os.path.exists(rutaArchivoCategorias)) or os.path.getsize(rutaArchivoCategorias) < 25:
+        with open(rutaArchivoCategorias, 'wt') as archivo:
             escritor = csv.DictWriter(archivo, fieldnames = fieldNamesCat, delimiter='|')
             escritor.writeheader()
             nombre = input('Ingrese un nombre para la nueva categoria: ')
@@ -376,7 +374,7 @@ def crearNuevaCategoria():
             escritor.writerow(diccionario)
             archivo.flush()
     else:
-        with open(nomArchCat, 'at') as archivo:
+        with open(rutaArchivoCategorias, 'at') as archivo:
             while decision != 'n':
                 escritor = csv.DictWriter(archivo, fieldnames = fieldNamesCat, delimiter='|')
                 nombre = input('Ingrese un nombre para la nueva categoria: ')
@@ -395,9 +393,9 @@ def asignarCategoria():
 
     categorias = []
     contador = 0
-    if os.path.exists(nomArchCat):
+    if os.path.exists(rutaArchivoCategorias):
         print('Categorias posibles')
-        with open(nomArchCat, 'r') as archivo:
+        with open(rutaArchivoCategorias, 'r') as archivo:
             lector = csv.DictReader(archivo, delimiter='|')
             for line in lector:
                 nomCategoria = line['nombre']
@@ -418,8 +416,8 @@ def asignarCategoria():
         return   
 
 def existeCodigo(codigoCar):
-    if os.path.exists(nomArchProd):
-        with open(nomArchProd, 'r') as archivo:
+    if os.path.exists(rutaArchivoProductos):
+        with open(rutaArchivoProductos, 'r') as archivo:
             lector = csv.DictReader(archivo, delimiter='|')
             for line in lector:
                 codigo = line['codigo']
@@ -459,8 +457,8 @@ def asignarValores():
             print('El nombre solo puede llevar letras o caracteres especiales, por favor, vuelva a cargarlo')
             newNombre = input('Ingrese el nombre del producto que desea cargar: ')
             
-        if os.path.exists(nomArchProd):
-            with open(nomArchProd, 'r') as archivo:
+        if os.path.exists(rutaArchivoProductos):
+            with open(rutaArchivoProductos, 'r') as archivo:
                 lector = csv.DictReader(archivo, delimiter='|')
                 for line in lector:
                     nombre = line['nombre']
@@ -498,13 +496,13 @@ def cargarProductos():
         producto = Producto(codigo, nombre, colores, precio, stock, categoria)
 
 
-        if not(os.path.exists(nomArchProd)) or os.path.getsize(nomArchProd) < 60:
-            with open(nomArchProd, 'wt') as archivo:
+        if not(os.path.exists(rutaArchivoProductos)) or os.path.getsize(rutaArchivoProductos) < 60:
+            with open(rutaArchivoProductos, 'wt') as archivo:
                 escritor = csv.DictWriter(archivo, fieldnames=fieldNamesProd, delimiter='|')
                 escritor.writeheader()
                 escritor.writerow(producto.cargador())
         else:
-            with open(nomArchProd, 'at') as archivo:
+            with open(rutaArchivoProductos, 'at') as archivo:
                 escritor = csv.DictWriter(archivo, fieldnames=fieldNamesProd, delimiter='|')
                 escritor.writerow(producto.cargador())
     
@@ -516,8 +514,8 @@ def cargarProductos():
 
 
 def main():
-    global nomArchProd
-    global nomArchCat 
+    global rutaArchivoProductos
+    global rutaArchivoCategorias 
     global fieldNamesProd
     global fieldNamesCat
     global idEspecificaArchivoProductos
@@ -526,8 +524,8 @@ def main():
 
     idEspecificaArchivoProductos = '1if16_12xy-PV6kp1blyzUtZ7B7cj0uTo'
     idEspecificaArchivoCategorias = '1rJPLwpcpMAXsNqaUO_KQI_JlobkhuVSz'
-    nomArchProd = 'DataBase.csv'
-    nomArchCat = 'CategoriesFile.csv'
+    rutaArchivoProductos = os.path.join('ArchivosBaseDatos', 'DataBase.csv')
+    rutaArchivoCategorias = os.path.join('ArchivosBaseDatos', 'CategoriesFile.csv')
     fieldNamesProd = ['codigo', 'nombre', 'colores', 'precio', 'stock', 'nombre_categoria', 'estado']
     fieldNamesCat = ['nombre', 'aumento', 'estado'] 
 
