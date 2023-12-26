@@ -705,8 +705,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-    with open('DataBase.csv', 'a+') as archivo:
-        lector = csv.reader(archivo)
-        for linea in lector:
-            print(linea[0])
 
