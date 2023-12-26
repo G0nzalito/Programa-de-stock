@@ -206,6 +206,11 @@ def modificarCampoEsp(codigo):
             while True:
                 banderaIgual = False
                 cambio = input('Ingrese el nombre del producto que desea cargar: ')
+
+                while esNumero(cambio):
+                    print('El nombre solo puede llevar letras o caracteres especiales, por favor, vuelva a cargarlo')
+                    cambio = input('Ingrese el nombre del producto que desea cargar: ')
+
                 if os.path.exists(rutaArchivoProductos):
                     with open(rutaArchivoProductos, 'r') as archivo:
                         lector = csv.DictReader(archivo, delimiter='|')
@@ -414,11 +419,15 @@ def crearNuevaCategoria():
             while decision != 'n':
                 escritor = csv.DictWriter(archivo, fieldnames = fieldNamesCat, delimiter='|')
                 nombre = input('Ingrese un nombre para la nueva categoria: ')
-                while existeNombre(nombre):
-                    print('ERROR, este nombre de categoria ya se encuentra cargado, por favor, cargue un nombre distinto')
+                while existeNombre(nombre) or esNumero(nombre):
+                    print('ERROR, este nombre de categoria ya se encuentra cargado o esta intentando cargar un nombre de categoria con numeros, por favor, revise lo que ingreso')
                     nombre = input('Ingrese un nombre para la nueva categoria: ')
 
                 aumento = input('Ingrese el aumento general que tendran los productos de esta categoria: ')
+                while not(esNumero(aumento)):
+                    print('ERROR, los aumentos van cargados en numeros, por favor, revise lo que ingresó')
+                    aumento = input('Ingrese el aumento general que tendran los productos de esta categoria: ')
+
                 diccionario = {'nombre': nombre, 'aumento': aumento, 'estado': True}
                 escritor.writerow(diccionario)
                 archivo.flush()
